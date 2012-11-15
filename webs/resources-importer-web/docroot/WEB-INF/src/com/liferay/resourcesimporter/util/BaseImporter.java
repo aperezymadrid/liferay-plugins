@@ -15,12 +15,8 @@
 package com.liferay.resourcesimporter.util;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
@@ -34,15 +30,10 @@ import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
@@ -53,32 +44,6 @@ import javax.servlet.ServletContext;
 public abstract class BaseImporter implements Importer {
 
 	public void afterPropertiesSet() throws Exception {
-		settingsProperties = new Properties();
-
-		try {
-			InputStream inputStream = null;
-
-			Class<?> clazz = getClass();
-
-			if (clazz.isAssignableFrom(FileSystemImporter.class)) {
-				inputStream = new FileInputStream(
-					resourcesDir.concat("settings.properties"));
-			}
-			else {
-				inputStream = servletContext.getResourceAsStream(
-					resourcesDir.concat("settings.properties"));
-			}
-
-			if (inputStream != null) {
-				String settingsString = StringUtil.read(inputStream);
-
-				PropertiesUtil.load(settingsProperties, settingsString);
-			}
-		}
-		catch (IOException e) {
-			_log.error(e, e);
-		}
-
 		User user = UserLocalServiceUtil.getDefaultUser(companyId);
 
 		userId = user.getUserId();
@@ -164,10 +129,6 @@ public abstract class BaseImporter implements Importer {
 		return groupId;
 	}
 
-	public Properties getSettingsProperties() {
-		return settingsProperties;
-	}
-
 	public long getTargetClassPK() {
 		return targetClassPK;
 	}
@@ -236,12 +197,9 @@ public abstract class BaseImporter implements Importer {
 	protected String resourcesDir;
 	protected ServletContext servletContext;
 	protected String servletContextName;
-	protected Properties settingsProperties;
 	protected String targetClassName;
 	protected long targetClassPK;
 	protected String targetValue;
 	protected long userId;
-
-	private static Log _log = LogFactoryUtil.getLog(BaseImporter.class);
 
 }
